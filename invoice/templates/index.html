@@ -2,18 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Create Invoice</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Base styles */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 15px;
+            margin: 0 auto;
+        }
+
+        /* Responsive grid */
         .items-grid {
             display: grid;
-            gap: 20px;
-            margin: 20px 0;
+            gap: 15px;
+            margin: 15px 0;
         }
-        
+
         .item-card {
             background: rgba(255, 255, 255, 0.9);
             padding: 15px;
@@ -21,6 +37,107 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: move;
+            touch-action: none;
+        }
+
+        /* Mobile-friendly form elements */
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px; /* Prevents zoom on iOS */
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Responsive form layout */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        /* Mobile-friendly buttons */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        @media (min-width: 768px) {
+            .button-group {
+                flex-direction: row;
+            }
+        }
+
+        /* Touch-friendly elements */
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+            padding: 12px;
+        }
+
+        /* Mobile-specific optimizations */
+        @media (max-width: 767px) {
+            .container {
+                padding: 10px;
+            }
+
+            .item-card {
+                padding: 12px;
+            }
+
+            .items-header {
+                display: none;
+            }
+
+            .form-row {
+                margin-bottom: 10px;
+            }
+
+            /* Stack elements vertically on mobile */
+            .quick-add {
+                flex-direction: column;
+            }
+
+            .item-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        /* Prevent text selection on draggable elements */
+        .item-card {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Mobile-friendly animations */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
         }
 
         .item-card:hover {
@@ -67,27 +184,6 @@
             font-weight: bold;
             margin-top: 10px;
             color: #007BFF;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 80px 100px;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .form-row input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            transition: border-color 0.2s;
-        }
-
-        .form-row input:focus {
-            border-color: #007BFF;
-            outline: none;
         }
 
         .items-header {
@@ -368,6 +464,7 @@
             <h2>Create Invoice</h2>
 
             <form action="/" method="POST" id="invoiceForm">
+                <input type="hidden" name="num_items" id="num_items" value="0">
                 <div class="form-container">
                     <!-- Step 1: Recipient Details -->
                     <div class="form-step active" id="step-1">
@@ -393,15 +490,15 @@
                             <div class="form-row">
                                 <div>
                                     <label for="item_name">Item Name:</label>
-                                    <input type="text" id="item_name" required>
+                                    <input type="text" id="item_name" name="item_name">
                                 </div>
                                 <div>
                                     <label for="quantity">Quantity:</label>
-                                    <input type="number" id="quantity" min="1" required>
+                                    <input type="number" id="quantity" name="quantity" min="1">
                                 </div>
                                 <div>
                                     <label for="price">Price (₹):</label>
-                                    <input type="number" id="price" step="0.01" required>
+                                    <input type="number" id="price" name="price" step="0.01">
                                 </div>
                             </div>
                             <div class="button-group">
@@ -566,35 +663,144 @@
 
         // Add num_items and item data to the form when submitting
         document.getElementById('invoiceForm').addEventListener('submit', function(e) {
-            const numItemsInput = document.createElement('input');
-            numItemsInput.type = 'hidden';
-            numItemsInput.name = 'num_items';
-            numItemsInput.value = items.length;
-            this.appendChild(numItemsInput);
-
+            e.preventDefault(); // Prevent default form submission
+            
+            // Validate that we have at least one item
+            if (items.length === 0) {
+                alert('Please add at least one item to the invoice.');
+                return;
+            }
+            
+            // Create a new FormData object
+            const formData = new FormData();
+            
+            // Add the basic form fields
+            formData.append('to_name', document.getElementById('to_name').value);
+            formData.append('to_address', document.getElementById('to_address').value);
+            formData.append('date', document.getElementById('date').value);
+            formData.append('advance_paid', document.getElementById('advance_paid').value);
+            
+            // Add the number of items
+            formData.append('num_items', items.length);
+            
+            // Add each item's data
             items.forEach((item, index) => {
-                const nameInput = document.createElement('input');
-                nameInput.type = 'hidden';
-                nameInput.name = `item_name_${index}`;
-                nameInput.value = item.name;
-                this.appendChild(nameInput);
-
-                const quantityInput = document.createElement('input');
-                quantityInput.type = 'hidden';
-                quantityInput.name = `quantity_${index}`;
-                quantityInput.value = item.quantity;
-                this.appendChild(quantityInput);
-
-                const priceInput = document.createElement('input');
-                priceInput.type = 'hidden';
-                priceInput.name = `price_${index}`;
-                priceInput.value = item.price;
-                this.appendChild(priceInput);
+                formData.append(`item_name_${index}`, item.name);
+                formData.append(`quantity_${index}`, item.quantity);
+                formData.append(`price_${index}`, item.price);
+            });
+            
+            // Submit the form data
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    // If the response is a PDF, open it in a new tab
+                    response.blob().then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        window.open(url, '_blank');
+                    });
+                } else {
+                    alert('Error generating invoice. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error generating invoice. Please try again.');
             });
         });
 
         // Update totals when advance payment changes
         document.getElementById('advance_paid').addEventListener('input', updateTotals);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile detection
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            // Touch event support
+            let touchStartY = 0;
+            let touchEndY = 0;
+            
+            document.addEventListener('touchstart', function(e) {
+                touchStartY = e.touches[0].clientY;
+            }, false);
+            
+            document.addEventListener('touchend', function(e) {
+                touchEndY = e.changedTouches[0].clientY;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                const swipeDistance = touchEndY - touchStartY;
+                if (Math.abs(swipeDistance) > 50) {
+                    // Prevent default scroll behavior
+                    e.preventDefault();
+                }
+            }
+            
+            // Mobile keyboard handling
+            const inputs = document.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    if (isMobile) {
+                        // Scroll the input into view
+                        setTimeout(() => {
+                            this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                    }
+                });
+            });
+            
+            // Mobile form submission handling
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (isMobile) {
+                        // Hide keyboard on form submission
+                        document.activeElement.blur();
+                    }
+                });
+            }
+            
+            // Mobile-friendly drag and drop
+            if (isMobile) {
+                const draggableElements = document.querySelectorAll('.item-card');
+                draggableElements.forEach(element => {
+                    element.style.touchAction = 'none';
+                    element.addEventListener('touchmove', function(e) {
+                        e.preventDefault();
+                    }, { passive: false });
+                });
+            }
+            
+            // Mobile viewport height fix
+            function setViewportHeight() {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+            
+            setViewportHeight();
+            window.addEventListener('resize', setViewportHeight);
+            window.addEventListener('orientationchange', setViewportHeight);
+            
+            // Prevent double-tap zoom on mobile
+            document.addEventListener('dblclick', function(e) {
+                if (isMobile) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // Mobile scroll optimization
+            let isScrolling;
+            window.addEventListener('scroll', function() {
+                window.clearTimeout(isScrolling);
+                isScrolling = setTimeout(function() {
+                    // Code to run after scrolling stops
+                }, 66);
+            }, false);
+        });
     </script>
 </body>
 </html>

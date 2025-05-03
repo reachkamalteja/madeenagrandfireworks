@@ -16,7 +16,7 @@ def generate_invoice_pdf(invoice_data):
     width, height = letter
 
     # Load the Photoshop template
-    template_path = "static/PROFORMA.JPG"
+    template_path = "invoice/static/PROFORMA.JPG"
     img = Image.open(template_path)
 
     # Draw the template as background
@@ -147,5 +147,5 @@ def index():
     return render_template('index.html')
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
 
