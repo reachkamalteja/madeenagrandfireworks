@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, redirect, url_for, session
+from functools import wraps
 
 from io import BytesIO
 from reportlab.pdfgen import canvas
@@ -6,8 +7,40 @@ from reportlab.lib.pagesizes import letter
 from PIL import Image
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, 
+    template_folder='invoice/templates',
+    static_folder='invoice/static'
+)
+app.secret_key = 'your-secret-key-here'  # Change this to a secure secret key
 
+# Login required decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'logged_in' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        # Replace these with your actual credentials
+        if username == "admin" and password == "admin123":
+            session['logged_in'] = True
+            return redirect(url_for('create_invoice'))
+        else:
+            return render_template('login.html', error="Invalid credentials")
+    
+    return render_template('login.html')
+
+@app.route("/logout")
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
 
 # Generate Invoice PDF
 def generate_invoice_pdf(invoice_data):
@@ -108,8 +141,9 @@ def generate_invoice_pdf(invoice_data):
     buffer.seek(0)
     return buffer
 
-@app.route("/", methods=["GET", "POST"])
-def index():
+@app.route("/create_invoice", methods=["GET", "POST"])
+@login_required
+def create_invoice():
     if request.method == "POST":
         # Retrieve form data
         items = []
@@ -124,14 +158,14 @@ def index():
         to_name = request.form['to_name']
         to_address = request.form['to_address']
         date = request.form['date']
-        advance_paid = float(request.form['advance_paid'])  # ✅ Get advance input
+        advance_paid = float(request.form['advance_paid'])
 
         # Invoice data dictionary
         invoice_data = {
             'to_name': to_name,
             'to_address': to_address,
             'date': date,
-            'advance_paid': advance_paid,  # ✅ Pass user-inputted advance
+            'advance_paid': advance_paid,
             'items': items
         }
 
@@ -144,7 +178,11 @@ def index():
         response.headers['Content-Disposition'] = 'inline; filename=invoice.pdf'
         return response
 
-    return render_template('index.html')
+    return render_template('create_invoice.html')
+
+@app.route("/")
+def index():
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=True)

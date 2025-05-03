@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Login - Madeena Grand Fireworks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            background-color: #000;
+        }
+
+        /* Video background */
+        #bg-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -1;
+            object-fit: cover;
+        }
+
+        /* Content container */
+        .content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Login container */
+        .login-container {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: clamp(25px, 6vw, 45px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5),
+                        0 0 20px rgba(255, 255, 255, 0.1);
+            width: min(95%, 420px);
+            position: relative;
+            z-index: 3;
+            animation: slideIn 0.8s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255, 107, 107, 0.1),
+                rgba(255, 142, 142, 0.1));
+            z-index: -1;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) rotateX(10deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        /* Title animation */
+        .login-container h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: clamp(25px, 6vw, 35px);
+            font-size: clamp(1.8em, 5vw, 2.5em);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            animation: titleGlow 2s infinite alternate;
+            position: relative;
+        }
+
+        .login-container h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ff6b6b, transparent);
+            animation: linePulse 2s infinite;
+        }
+
+        @keyframes linePulse {
+            0%, 100% { width: 50px; opacity: 0.5; }
+            50% { width: 100px; opacity: 1; }
+        }
+
+        @keyframes titleGlow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        /* Input fields */
+        .input-group {
+            margin-bottom: clamp(20px, 5vw, 25px);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .input-group:hover {
+            transform: translateY(-2px);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: clamp(15px, 4vw, 18px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: clamp(15px, 4vw, 16px);
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Button styles */
+        .login-btn {
+            width: 100%;
+            padding: clamp(15px, 4vw, 18px);
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: clamp(15px, 4vw, 16px);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+            background: linear-gradient(45deg, #ff8e8e, #ff6b6b);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Error message */
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: clamp(15px, 4vw, 20px);
+            font-size: clamp(13px, 3vw, 14px);
+            display: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            animation: shake 0.5s ease-in-out;
+            padding: 10px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Welcome message */
+        .welcome-message {
+            position: fixed;
+            top: clamp(15px, 4vw, 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: clamp(12px, 3vw, 15px) clamp(25px, 5vw, 35px);
+            border-radius: 30px;
+            color: #fff;
+            font-weight: 500;
+            font-size: clamp(14px, 4vw, 16px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 4;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: float 3s ease-in-out infinite;
+            white-space: nowrap;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, -10px); }
+        }
+
+        /* Responsive optimizations */
+        @media (max-width: 768px) {
+            .content {
+                padding: 15px;
+            }
+
+            .login-container {
+                width: 95%;
+                max-width: 400px;
+            }
+
+            /* Prevent double-tap zoom on mobile */
+            .input-group, .login-btn {
+                touch-action: manipulation;
+            }
+        }
+
+        /* Landscape mode optimization */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .content {
+                padding: 10px;
+            }
+
+            .login-container {
+                margin: 10px auto;
+            }
+        }
+
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        /* Fix for iOS input zoom */
+        @supports (-webkit-touch-callout: none) {
+            input {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <video autoplay muted loop id="bg-video" playsinline>
+        <source src="static/bg.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="content">
+        <div class="welcome-message" id="welcomeMessage">Welcome Mujju Bhai</div>
+        <div class="login-container">
+            <h1>Admin Login</h1>
+            <form action="{{ url_for('login') }}" method="POST" class="login-form">
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Username" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Password" required>
+                </div>
+                {% if error %}
+                <div class="error-message" style="display: block;">
+                    {{ error }}
+                </div>
+                {% endif %}
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Voice synthesis
+        function speakWelcome() {
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            welcomeMessage.style.opacity = '1';
+            
+            const speech = new SpeechSynthesisUtterance();
+            speech.text = "Welcome Mujju Bhai";
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            
+            window.speechSynthesis.speak(speech);
+            
+            setTimeout(() => {
+                welcomeMessage.style.opacity = '0';
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            speakWelcome();
+            
+            // Handle form submission
+            document.querySelector('.login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                
+                try {
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        window.location.href = '/';
+                    } else {
+                        const errorMessage = document.querySelector('.error-message');
+                        errorMessage.style.display = 'block';
+                        errorMessage.style.animation = 'none';
+                        errorMessage.offsetHeight; // Trigger reflow
+                        errorMessage.style.animation = 'shake 0.5s ease-in-out';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.querySelector('.error-message').style.display = 'block';
+                }
+            });
+
+            // Mobile keyboard handling
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    if (window.innerHeight < 600) {
+                        setTimeout(() => {
+                            this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

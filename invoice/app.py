@@ -1,13 +1,45 @@
-from flask import Flask, render_template, request, make_response
-
+from flask import Flask, render_template, request, make_response, redirect, url_for, session
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from PIL import Image
 from datetime import datetime
+import os
+from functools import wraps
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # For session management
 
+# Admin credentials (in production, use environment variables or a database)
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "mujjubhai123"  # Change this to a secure password
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'logged_in' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+        else:
+            return render_template('login.html', error="Invalid credentials")
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
 
 # Generate Invoice PDF
 def generate_invoice_pdf(invoice_data):
@@ -109,6 +141,7 @@ def generate_invoice_pdf(invoice_data):
     return buffer
 
 @app.route("/", methods=["GET", "POST"])
+@login_required
 def index():
     if request.method == "POST":
         # Retrieve form data

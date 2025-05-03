@@ -3,644 +3,876 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Create Invoice</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="static/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Create Invoice | Madeena Grand Fireworks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Base styles */
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --danger: #ef4444;
+        }
+        
         body {
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            -webkit-text-size-adjust: 100%;
-        }
-
-        .container {
-            max-width: 100%;
-            padding: 15px;
-            margin: 0 auto;
-        }
-
-        /* Responsive grid */
-        .items-grid {
-            display: grid;
-            gap: 15px;
-            margin: 15px 0;
-        }
-
-        .item-card {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: move;
-            touch-action: none;
-        }
-
-        /* Mobile-friendly form elements */
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px; /* Prevents zoom on iOS */
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        button {
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--dark);
+            min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Responsive form layout */
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
         }
-
-        @media (min-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr 1fr 1fr;
+        
+        .invoice-card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .invoice-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding: 0 1rem;
+        }
+        
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            right: 1rem;
+            height: 2px;
+            background-color: #e2e8f0;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        
+        .step {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: #e2e8f0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .step.active {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step.completed {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .step-label {
+            position: absolute;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .item-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary);
+            position: relative;
+        }
+        
+        .item-card:hover {
+            transform: translateX(2px);
+        }
+        
+        .btn {
+            transition: all 0.2s ease;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #0d9c6b;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger:active {
+            transform: translateY(0);
+        }
+        
+        .form-step {
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-
-        /* Mobile-friendly buttons */
-        .button-group {
+        
+        .floating-label {
+            position: relative;
+            margin-bottom: 1.25rem;
+        }
+        
+        .floating-label input, .floating-label select {
+            padding: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            width: 100%;
+            background-color: white;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            -webkit-appearance: none;
+        }
+        
+        .floating-label input:focus, .floating-label select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .floating-label label {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            color: #64748b;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            background-color: white;
+            padding: 0 0.25rem;
+            font-size: 1rem;
+        }
+        
+        .floating-label input:focus + label,
+        .floating-label input:not(:placeholder-shown) + label,
+        .floating-label select:focus + label,
+        .floating-label select:not([value=""]) + label {
+            top: -0.5rem;
+            left: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+        
+        .total-display {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .total-display .amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .empty-state {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin: 15px 0;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.5rem;
+            background-color: #f8fafc;
         }
-
-        @media (min-width: 768px) {
-            .button-group {
-                flex-direction: row;
+        
+        .empty-state i {
+            font-size: 2rem;
+            color: #94a3b8;
+            margin-bottom: 0.75rem;
+        }
+        
+        .empty-state p {
+            color: #64748b;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            .step-indicator {
+                margin-bottom: 1rem;
+            }
+            
+            .step {
+                width: 1.75rem;
+                height: 1.75rem;
+                font-size: 0.75rem;
+            }
+            
+            .step-label {
+                display: none;
+            }
+            
+            .logo-container {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .logo-icon {
+                width: 2rem;
+                height: 2rem;
+                font-size: 1rem;
+            }
+            
+            .invoice-card {
+                padding: 1rem;
+            }
+            
+            .floating-label input, .floating-label select {
+                padding: 0.875rem;
+            }
+            
+            .floating-label label {
+                font-size: 0.875rem;
+            }
+            
+            .btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .total-display .amount {
+                font-size: 1.1rem;
             }
         }
-
-        /* Touch-friendly elements */
+        
+        /* Date input styling */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            background: transparent;
+            bottom: 0;
+            color: transparent;
+            cursor: pointer;
+            height: auto;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: auto;
+        }
+        
+        /* Remove number input spinners */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* iOS touch target adjustments */
         .touch-target {
             min-height: 44px;
             min-width: 44px;
-            padding: 12px;
-        }
-
-        /* Mobile-specific optimizations */
-        @media (max-width: 767px) {
-            .container {
-                padding: 10px;
-            }
-
-            .item-card {
-                padding: 12px;
-            }
-
-            .items-header {
-                display: none;
-            }
-
-            .form-row {
-                margin-bottom: 10px;
-            }
-
-            /* Stack elements vertically on mobile */
-            .quick-add {
-                flex-direction: column;
-            }
-
-            .item-actions {
-                flex-direction: column;
-                gap: 5px;
-            }
-        }
-
-        /* Prevent text selection on draggable elements */
-        .item-card {
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        /* Mobile-friendly animations */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-                scroll-behavior: auto !important;
-            }
-        }
-
-        .item-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .item-card.dragging {
-            opacity: 0.5;
-            background: #f8f9fa;
-        }
-
-        .item-card h3 {
-            margin-top: 0;
-            color: #333;
-            border-bottom: 2px solid #007BFF;
-            padding-bottom: 5px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
         }
-
-        .item-actions {
-            display: flex;
-            gap: 10px;
+        
+        /* Keyboard navigation focus styles */
+        .focus-visible:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
-
-        .item-actions button {
-            background: none;
-            border: none;
-            color: #666;
+        
+        /* Animation for item add/remove */
+        @keyframes itemAdd {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes itemRemove {
+            0% { opacity: 1; transform: translateX(0); }
+            100% { opacity: 0; transform: translateX(20px); }
+        }
+        
+        .item-add {
+            animation: itemAdd 0.3s ease forwards;
+        }
+        
+        .item-remove {
+            animation: itemRemove 0.3s ease forwards;
+        }
+        
+        /* Toast animations */
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fade-out {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 0.3s ease forwards;
+        }
+        
+        .animate-fade-out {
+            animation: fade-out 0.3s ease forwards;
+        }
+        
+        /* Pulse animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .animate-pulse {
+            animation: pulse 0.5s ease;
+        }
+        
+        /* Mobile menu button */
+        .menu-btn {
+            width: 30px;
+            height: 20px;
+            position: relative;
+            transform: rotate(0deg);
+            transition: .5s ease-in-out;
             cursor: pointer;
-            padding: 5px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
         }
-
-        .item-actions button:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-        }
-
-        .item-total {
-            text-align: right;
-            font-weight: bold;
-            margin-top: 10px;
-            color: #007BFF;
-        }
-
-        .items-header {
-            display: grid;
-            grid-template-columns: 1fr 80px 100px;
-            gap: 10px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            padding: 0 8px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            padding: 10px;
-        }
-
-        #total-section {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        #total-section p {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-            font-size: 1.1em;
-        }
-
-        #total-section .total-amount {
-            font-weight: bold;
-            color: #007BFF;
-        }
-
-        .bulk-import {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .bulk-import textarea {
-            width: 100%;
-            height: 100px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            resize: vertical;
-        }
-
-        .bulk-import button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .bulk-import button:hover {
-            background-color: #218838;
-        }
-
-        .quick-add {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .quick-add input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .quick-add button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .quick-add button:hover {
-            background-color: #0056b3;
-        }
-
-        .item-count {
-            margin: 10px 0;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .search-box {
-            margin-bottom: 20px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
-        .item-card.highlight {
-            animation: highlight 1s ease-out;
-        }
-
-        @keyframes highlight {
-            0% { background-color: #fff3cd; }
-            100% { background-color: rgba(255, 255, 255, 0.9); }
-        }
-
-        .form-step {
-            display: none;
-            opacity: 0;
-            transform: translateX(50px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        .form-step.active {
+        
+        .menu-btn span {
             display: block;
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .item-form {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin: 20px 0;
-        }
-
-        .item-form h3 {
-            margin-top: 0;
-            color: #333;
-            border-bottom: 2px solid #007BFF;
-            padding-bottom: 5px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .form-row input {
+            position: absolute;
+            height: 3px;
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            background: white;
+            border-radius: 3px;
+            opacity: 1;
+            left: 0;
+            transform: rotate(0deg);
+            transition: .25s ease-in-out;
         }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
+        
+        .menu-btn span:nth-child(1) {
+            top: 0px;
         }
-
-        .button-group button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.2s;
+        
+        .menu-btn span:nth-child(2), .menu-btn span:nth-child(3) {
+            top: 10px;
         }
-
-        .button-next {
-            background-color: #007BFF;
-            color: white;
+        
+        .menu-btn span:nth-child(4) {
+            top: 20px;
         }
-
-        .button-next:hover {
-            background-color: #0056b3;
+        
+        .menu-btn.open span:nth-child(1) {
+            top: 10px;
+            width: 0%;
+            left: 50%;
         }
-
-        .button-complete {
-            background-color: #28a745;
-            color: white;
+        
+        .menu-btn.open span:nth-child(2) {
+            transform: rotate(45deg);
         }
-
-        .button-complete:hover {
-            background-color: #218838;
+        
+        .menu-btn.open span:nth-child(3) {
+            transform: rotate(-45deg);
         }
-
-        .button-back {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .button-back:hover {
-            background-color: #5a6268;
-        }
-
-        #items-list {
-            margin: 20px 0;
-        }
-
-        .item-card {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .item-details {
-            flex: 1;
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .item-actions button {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .item-actions button:hover {
-            color: #333;
-        }
-
-        #total-section {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        #total-section p {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-            font-size: 1.1em;
-        }
-
-        .total-amount {
-            font-weight: bold;
-            color: #007BFF;
+        
+        .menu-btn.open span:nth-child(4) {
+            top: 10px;
+            width: 0%;
+            left: 50%;
         }
     </style>
 </head>
-<body>
-    <!-- Video Background -->
-    <video autoplay muted loop id="bg-video">
-        <source src="static/bg.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-
-    <div class="content">
-        <!-- Title Section -->
-        <div class="title-section">
-            <h1>MADEENA GRAND FIREWORKS</h1>
-            <p>SULLURPETA / BANGALORE / CHENNAI / HYDERABAD</p>
+<body class="min-h-screen flex flex-col">
+    <!-- Header with mobile menu -->
+    <header class="gradient-bg text-white py-4 px-4 shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">MADEENA GRAND FIREWORKS</h1>
+                    <p class="text-xs opacity-80">SULLURPETA / BANGALORE / CHENNAI / HYDERABAD</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="{{ url_for('logout') }}" class="text-white hover:text-red-300 transition-colors">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+                <button id="mobile-menu-btn" class="menu-btn md:hidden">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
+    </header>
 
-        <!-- Form Section -->
-        <div class="container">
-            <h2>Create Invoice</h2>
-
-            <form action="/" method="POST" id="invoiceForm">
-                <input type="hidden" name="num_items" id="num_items" value="0">
-                <div class="form-container">
-                    <!-- Step 1: Recipient Details -->
-                    <div class="form-step active" id="step-1">
-                        <h2>Step 1: Recipient Details</h2>
-                        <label for="to_name">Recipient Name:</label>
-                        <input type="text" id="to_name" name="to_name" required><br><br>
+    <!-- Main Content -->
+    <main class="flex-grow py-6 px-4">
+        <div class="container mx-auto max-w-4xl">
+            <div class="bg-white invoice-card p-4 md:p-6 rounded-xl">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-file-invoice text-indigo-500"></i>
+                    Create New Invoice
+                </h2>
                 
-                        <label for="to_address">Recipient Address:</label>
-                        <input type="text" id="to_address" name="to_address" required><br><br>
-                
-                        <label for="date">Invoice Date:</label>
-                        <input type="date" id="date" name="date" required><br><br>
-                
-                        <button type="button" onclick="nextStep(1)">Add Items</button>
+                <!-- Step Indicator with labels -->
+                <div class="step-indicator mb-6">
+                    <div class="step active" id="step-1-indicator">
+                        <span>1</span>
+                        <span class="step-label">Details</span>
                     </div>
-                
-                    <!-- Step 2: Add Items -->
-                    <div class="form-step" id="step-2">
-                        <h2>Step 2: Add Items</h2>
-                        
-                        <div class="item-form">
-                            <h3>Item Details</h3>
-                            <div class="form-row">
-                                <div>
-                                    <label for="item_name">Item Name:</label>
-                                    <input type="text" id="item_name" name="item_name">
-                                </div>
-                                <div>
-                                    <label for="quantity">Quantity:</label>
-                                    <input type="number" id="quantity" name="quantity" min="1">
-                                </div>
-                                <div>
-                                    <label for="price">Price (₹):</label>
-                                    <input type="number" id="price" name="price" step="0.01">
-                                </div>
-                            </div>
-                            <div class="button-group">
-                                <button type="button" class="button-back" onclick="prevStep(2)">Back</button>
-                                <button type="button" class="button-next" onclick="addItem()">Next Item</button>
-                                <button type="button" class="button-complete" onclick="completeItems()">Complete</button>
-                            </div>
-                        </div>
-
-                        <div id="items-list"></div>
-                        
-                        <div id="total-section">
-                            <p>
-                                <span>Total Amount:</span>
-                                <span class="total-amount">₹0.00</span>
-                            </p>
-                        </div>
+                    <div class="step" id="step-2-indicator">
+                        <span>2</span>
+                        <span class="step-label">Items</span>
                     </div>
-                
-                    <!-- Step 3: Payment -->
-                    <div class="form-step" id="step-3">
-                        <h2>Step 3: Payment</h2>
-                        <label for="advance_paid">Advance Paid (₹):</label>
-                        <input type="number" id="advance_paid" name="advance_paid" min="0" value="0" required><br><br>
-                
-                        <div id="payment-summary">
-                            <p>
-                                <span>Total Amount:</span>
-                                <span id="final-total">₹0.00</span>
-                            </p>
-                            <p>
-                                <span>Advance Paid:</span>
-                                <span id="advance-amount">₹0.00</span>
-                            </p>
-                            <p>
-                                <span>Balance Due:</span>
-                                <span id="balance-due">₹0.00</span>
-                            </p>
-                        </div>
-                
-                        <button type="button" class="button-back" onclick="prevStep(3)">Back</button>
-                        <button type="submit">Generate Invoice</button>
+                    <div class="step" id="step-3-indicator">
+                        <span>3</span>
+                        <span class="step-label">Payment</span>
                     </div>
                 </div>
-            </form>
+                
+                <form action="/" method="POST" id="invoiceForm">
+                    <input type="hidden" name="num_items" id="num_items" value="0">
+                    
+                    <!-- Step 1: Recipient Details -->
+                    <div class="form-step active" id="step-1">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Recipient Information</h3>
+                        
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="floating-label">
+                                <input type="text" id="to_name" name="to_name" placeholder=" " required class="focus-visible">
+                                <label for="to_name">Recipient Name</label>
+                            </div>
+                            
+                            <div class="floating-label">
+                                <input type="date" id="date" name="date" placeholder=" " required class="focus-visible">
+                                <label for="date">Invoice Date</label>
+                            </div>
+                            
+                            <div class="floating-label">
+                                <input type="text" id="to_address" name="to_address" placeholder=" " required class="focus-visible">
+                                <label for="to_address">Recipient Address</label>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end mt-6">
+                            <button type="button" onclick="nextStep(1)" class="btn btn-primary text-white px-5 py-2 rounded-lg font-medium flex items-center gap-2 touch-target">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Add Items -->
+                    <div class="form-step hidden" id="step-2">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Add Invoice Items</h3>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                <i class="fas fa-plus-circle text-indigo-500"></i> Add New Item
+                            </h4>
+                            
+                            <div class="grid grid-cols-1 gap-3">
+                                <div class="floating-label">
+                                    <input type="text" id="item_name" name="item_name" placeholder=" " class="focus-visible">
+                                    <label for="item_name">Item Name</label>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="floating-label">
+                                        <input type="number" id="quantity" name="quantity" min="1" placeholder=" " value="1" class="focus-visible">
+                                        <label for="quantity">Quantity</label>
+                                    </div>
+                                    
+                                    <div class="floating-label">
+                                        <input type="number" id="price" name="price" step="0.01" placeholder=" " class="focus-visible">
+                                        <label for="price">Price (₹)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end mt-3 gap-2">
+                                <button type="button" onclick="addItem()" class="btn btn-secondary text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 touch-target">
+                                    <i class="fas fa-plus"></i> Add Item
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="items-list">
+                            <div id="empty-state" class="empty-state">
+                                <i class="fas fa-box-open"></i>
+                                <h4 class="font-medium text-gray-700 mb-1">No items added yet</h4>
+                                <p class="text-gray-500">Start by adding your first item above</p>
+                            </div>
+                        </div>
+                        
+                        <div class="total-display mt-4">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-gray-600">Total Amount:</span>
+                                <span class="amount" id="total-amount">₹0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between mt-6 gap-3">
+                            <button type="button" onclick="prevStep(2)" class="btn bg-gray-200 text-gray-700 px-5 py-2 rounded-lg font-medium flex items-center gap-2 touch-target">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="button" onclick="nextStep(2)" class="btn btn-primary text-white px-5 py-2 rounded-lg font-medium flex items-center gap-2 touch-target">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Payment -->
+                    <div class="form-step hidden" id="step-3">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Payment Details</h3>
+                        
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="floating-label">
+                                <input type="number" id="advance_paid" name="advance_paid" min="0" value="0" placeholder=" " required class="focus-visible">
+                                <label for="advance_paid">Advance Paid (₹)</label>
+                            </div>
+                            
+                            <div class="total-display">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div class="text-center">
+                                        <p class="text-sm text-gray-500">Total Amount</p>
+                                        <p class="font-bold text-lg" id="final-total">₹0.00</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-sm text-gray-500">Advance Paid</p>
+                                        <p class="font-bold text-lg" id="advance-amount">₹0.00</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-sm text-gray-500">Balance Due</p>
+                                        <p class="font-bold text-lg text-indigo-600" id="balance-due">₹0.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between mt-6 gap-3">
+                            <button type="button" onclick="prevStep(3)" class="btn bg-gray-200 text-gray-700 px-5 py-2 rounded-lg font-medium flex items-center gap-2 touch-target">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="submit" class="btn btn-primary text-white px-5 py-2 rounded-lg font-medium flex items-center gap-2 touch-target">
+                                <i class="fas fa-file-invoice"></i> Generate Invoice
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-3 px-4">
+        <div class="container mx-auto text-center text-xs">
+            <p>© 2023 Madeena Grand Fireworks. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
         let currentStep = 1;
         let items = [];
         let totalAmount = 0;
 
+        // Initialize floating labels for selects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            
+            // Add animation to step indicators
+            const steps = document.querySelectorAll('.step');
+            steps.forEach(step => {
+                step.addEventListener('click', function() {
+                    this.classList.add('animate-pulse');
+                    setTimeout(() => {
+                        this.classList.remove('animate-pulse');
+                    }, 300);
+                });
+            });
+            
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            menuBtn.addEventListener('click', function() {
+                this.classList.toggle('open');
+                // Add mobile menu functionality if needed
+            });
+            
+            // Improve touch experience for buttons
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.classList.add('active');
+                });
+                
+                btn.addEventListener('touchend', function() {
+                    this.classList.remove('active');
+                });
+            });
+            
+            // Auto-focus first input on step change
+            document.getElementById('to_name').focus();
+        });
+
         function validateStep(step) {
             if (step === 1) {
-                const name = document.getElementById('to_name').value;
-                const address = document.getElementById('to_address').value;
+                const name = document.getElementById('to_name').value.trim();
+                const address = document.getElementById('to_address').value.trim();
                 const date = document.getElementById('date').value;
-                return name && address && date;
+                
+                if (!name || !address || !date) {
+                    showToast('Please fill in all required fields before proceeding.', 'error');
+                    return false;
+                }
+                return true;
             }
+            
             if (step === 2) {
-                return items.length > 0;
+                if (items.length === 0) {
+                    showToast('Please add at least one item to the invoice.', 'error');
+                    return false;
+                }
+                return true;
             }
+            
             return true;
         }
 
         function nextStep(step) {
-            if (!validateStep(step)) {
-                alert('Please fill in all required fields before proceeding.');
-                return;
-            }
-            document.getElementById(`step-${step}`).classList.remove("active");
-            document.getElementById(`step-${step + 1}`).classList.add("active");
+            if (!validateStep(step)) return;
+            
+            // Update step indicators
+            document.getElementById(`step-${step}-indicator`).classList.remove('active');
+            document.getElementById(`step-${step}-indicator`).classList.add('completed');
+            document.getElementById(`step-${step + 1}-indicator`).classList.add('active');
+            
+            // Animate steps
+            document.getElementById(`step-${step}`).classList.remove('active');
+            document.getElementById(`step-${step}`).classList.add('hidden');
+            
+            document.getElementById(`step-${step + 1}`).classList.remove('hidden');
+            document.getElementById(`step-${step + 1}`).classList.add('active');
+            
             currentStep = step + 1;
+            
+            // If going to step 3, update payment summary
+            if (step === 2) {
+                updatePaymentSummary();
+            }
+            
+            // Scroll to top of form on step change
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
     
         function prevStep(step) {
-            document.getElementById(`step-${step}`).classList.remove("active");
-            document.getElementById(`step-${step - 1}`).classList.add("active");
+            // Update step indicators
+            document.getElementById(`step-${step}-indicator`).classList.remove('active');
+            document.getElementById(`step-${step - 1}-indicator`).classList.remove('completed');
+            document.getElementById(`step-${step - 1}-indicator`).classList.add('active');
+            
+            // Animate steps
+            document.getElementById(`step-${step}`).classList.remove('active');
+            document.getElementById(`step-${step}`).classList.add('hidden');
+            
+            document.getElementById(`step-${step - 1}`).classList.remove('hidden');
+            document.getElementById(`step-${step - 1}`).classList.add('active');
+            
             currentStep = step - 1;
+            
+            // Scroll to top of form on step change
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
         function addItem() {
-            const name = document.getElementById('item_name').value;
-            const quantity = document.getElementById('quantity').value;
-            const price = document.getElementById('price').value;
-
-            if (!name || !quantity || !price) {
-                alert('Please fill in all item details.');
+            const name = document.getElementById('item_name').value.trim();
+            const quantity = parseFloat(document.getElementById('quantity').value) || 1;
+            const price = parseFloat(document.getElementById('price').value);
+            
+            if (!name || isNaN(price)) {
+                showToast('Please fill in item name and price.', 'error');
                 return;
             }
-
+            
             const item = {
                 id: Date.now(),
                 name,
-                quantity: parseFloat(quantity),
-                price: parseFloat(price)
+                quantity,
+                price
             };
-
+            
             items.push(item);
             renderItems();
             updateTotals();
-
-            // Clear the form
+            
+            // Clear the form and focus on name
             document.getElementById('item_name').value = '';
-            document.getElementById('quantity').value = '';
+            document.getElementById('quantity').value = '1';
             document.getElementById('price').value = '';
             document.getElementById('item_name').focus();
+            
+            // Show success feedback
+            showToast('Item added successfully!', 'success');
+            
+            // Scroll to the new item
+            const itemsContainer = document.getElementById('items-list');
+            itemsContainer.lastChild.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
         }
 
         function removeItem(id) {
-            items = items.filter(item => item.id !== id);
-            renderItems();
-            updateTotals();
-        }
-
-        function completeItems() {
-            if (items.length === 0) {
-                alert('Please add at least one item.');
-                return;
+            const itemElement = document.querySelector(`[data-item-id="${id}"]`);
+            if (itemElement) {
+                itemElement.classList.add('item-remove');
+                setTimeout(() => {
+                    items = items.filter(item => item.id !== id);
+                    renderItems();
+                    updateTotals();
+                    showToast('Item removed.', 'info');
+                }, 300);
             }
-            nextStep(2);
         }
 
         function renderItems() {
             const container = document.getElementById('items-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (items.length === 0) {
+                if (!emptyState) {
+                    container.innerHTML = `
+                        <div id="empty-state" class="empty-state">
+                            <i class="fas fa-box-open"></i>
+                            <h4 class="font-medium text-gray-700 mb-1">No items added yet</h4>
+                            <p class="text-gray-500">Start by adding your first item above</p>
+                        </div>
+                    `;
+                } else {
+                    emptyState.classList.remove('hidden');
+                }
+                return;
+            }
+            
+            if (emptyState) emptyState.classList.add('hidden');
+            
             container.innerHTML = '';
-
+            
             items.forEach((item, index) => {
+                const itemTotal = (item.quantity * item.price).toFixed(2);
+                
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'item-card';
+                itemDiv.className = 'item-card bg-white p-3 rounded-lg mb-2 shadow-sm hover:shadow-md transition item-add';
+                itemDiv.dataset.itemId = item.id;
                 itemDiv.innerHTML = `
-                    <div class="item-details">
-                        <strong>${index + 1}. ${item.name}</strong>
-                        <div>Quantity: ${item.quantity} | Price: ₹${item.price.toFixed(2)} | Total: ₹${(item.quantity * item.price).toFixed(2)}</div>
-                    </div>
-                    <div class="item-actions">
-                        <button onclick="removeItem(${item.id})" title="Remove Item">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-medium text-gray-800 truncate">${item.name}</h4>
+                            <div class="text-sm text-gray-500 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                                <span>Qty: ${item.quantity}</span>
+                                <span>Price: ₹${item.price.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 ml-2">
+                            <span class="font-semibold text-gray-700 whitespace-nowrap">₹${itemTotal}</span>
+                            <button onclick="removeItem(${item.id})" class="text-red-500 hover:text-red-700 transition p-2 rounded-full hover:bg-red-50 touch-target">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
+                
                 container.appendChild(itemDiv);
             });
         }
@@ -650,8 +882,8 @@
             items.forEach(item => {
                 total += item.quantity * item.price;
             });
-
-            document.querySelector('.total-amount').textContent = `₹${total.toFixed(2)}`;
+            
+            document.getElementById('total-amount').textContent = `₹${total.toFixed(2)}`;
             document.getElementById('final-total').textContent = `₹${total.toFixed(2)}`;
             
             const advancePaid = parseFloat(document.getElementById('advance_paid').value) || 0;
@@ -660,16 +892,26 @@
             
             totalAmount = total;
         }
+        
+        function updatePaymentSummary() {
+            updateTotals();
+        }
 
         // Add num_items and item data to the form when submitting
         document.getElementById('invoiceForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent default form submission
+            e.preventDefault();
             
             // Validate that we have at least one item
             if (items.length === 0) {
-                alert('Please add at least one item to the invoice.');
+                showToast('Please add at least one item to the invoice.', 'error');
                 return;
             }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            submitBtn.disabled = true;
             
             // Create a new FormData object
             const formData = new FormData();
@@ -698,109 +940,82 @@
             .then(response => {
                 if (response.ok) {
                     // If the response is a PDF, open it in a new tab
-                    response.blob().then(blob => {
+                    return response.blob().then(blob => {
                         const url = window.URL.createObjectURL(blob);
                         window.open(url, '_blank');
+                        showToast('Invoice generated successfully!', 'success');
                     });
                 } else {
-                    alert('Error generating invoice. Please try again.');
+                    throw new Error('Error generating invoice');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error generating invoice. Please try again.');
+                showToast('Error generating invoice. Please try again.', 'error');
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             });
         });
 
         // Update totals when advance payment changes
         document.getElementById('advance_paid').addEventListener('input', updateTotals);
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mobile detection
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            // Remove existing toasts
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
             
-            // Touch event support
-            let touchStartY = 0;
-            let touchEndY = 0;
+            const toast = document.createElement('div');
+            toast.className = `toast fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg text-white font-medium flex items-center gap-2 z-50 animate-fade-in-up ${getToastColor(type)}`;
+            toast.innerHTML = `
+                <i class="${getToastIcon(type)}"></i>
+                <span>${message}</span>
+            `;
             
-            document.addEventListener('touchstart', function(e) {
-                touchStartY = e.touches[0].clientY;
-            }, false);
+            document.body.appendChild(toast);
             
-            document.addEventListener('touchend', function(e) {
-                touchEndY = e.changedTouches[0].clientY;
-                handleSwipe();
-            }, false);
-            
-            function handleSwipe() {
-                const swipeDistance = touchEndY - touchStartY;
-                if (Math.abs(swipeDistance) > 50) {
-                    // Prevent default scroll behavior
+            setTimeout(() => {
+                toast.classList.remove('animate-fade-in-up');
+                toast.classList.add('animate-fade-out');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+        
+        function getToastColor(type) {
+            switch(type) {
+                case 'success': return 'bg-green-500';
+                case 'error': return 'bg-red-500';
+                case 'warning': return 'bg-yellow-500';
+                default: return 'bg-indigo-500';
+            }
+        }
+        
+        function getToastIcon(type) {
+            switch(type) {
+                case 'success': return 'fas fa-check-circle';
+                case 'error': return 'fas fa-exclamation-circle';
+                case 'warning': return 'fas fa-exclamation-triangle';
+                default: return 'fas fa-info-circle';
+            }
+        }
+        
+        // Handle keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (currentStep === 1) {
                     e.preventDefault();
+                    nextStep(1);
+                } else if (currentStep === 2 && document.activeElement.id === 'price') {
+                    e.preventDefault();
+                    addItem();
                 }
             }
-            
-            // Mobile keyboard handling
-            const inputs = document.querySelectorAll('input, textarea');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    if (isMobile) {
-                        // Scroll the input into view
-                        setTimeout(() => {
-                            this.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }, 300);
-                    }
-                });
-            });
-            
-            // Mobile form submission handling
-            const form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    if (isMobile) {
-                        // Hide keyboard on form submission
-                        document.activeElement.blur();
-                    }
-                });
-            }
-            
-            // Mobile-friendly drag and drop
-            if (isMobile) {
-                const draggableElements = document.querySelectorAll('.item-card');
-                draggableElements.forEach(element => {
-                    element.style.touchAction = 'none';
-                    element.addEventListener('touchmove', function(e) {
-                        e.preventDefault();
-                    }, { passive: false });
-                });
-            }
-            
-            // Mobile viewport height fix
-            function setViewportHeight() {
-                const vh = window.innerHeight * 0.01;
-                document.documentElement.style.setProperty('--vh', `${vh}px`);
-            }
-            
-            setViewportHeight();
-            window.addEventListener('resize', setViewportHeight);
-            window.addEventListener('orientationchange', setViewportHeight);
-            
-            // Prevent double-tap zoom on mobile
-            document.addEventListener('dblclick', function(e) {
-                if (isMobile) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-            
-            // Mobile scroll optimization
-            let isScrolling;
-            window.addEventListener('scroll', function() {
-                window.clearTimeout(isScrolling);
-                isScrolling = setTimeout(function() {
-                    // Code to run after scrolling stops
-                }, 66);
-            }, false);
         });
     </script>
 </body>
-</html>
+</html> 
